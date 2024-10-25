@@ -52,6 +52,7 @@ export default function CreateBooking() {
               console.log("Sync registered");
               window.alert("Sync registered");
             })
+            // @ts-expect-error - error is not defined
             .catch((error) => {
               console.error("Failed to register sync", error);
               sendBookingToServer();
