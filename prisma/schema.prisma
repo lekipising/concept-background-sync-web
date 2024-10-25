@@ -15,4 +15,5 @@ model Booking {
   id        Int      @id @default(autoincrement())
   name      String
   arrival   DateTime
+  createdAt DateTime @default(now())
 }
