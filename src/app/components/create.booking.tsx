@@ -27,6 +27,17 @@ export default function CreateBooking() {
     window.alert("Booking queued for sync!");
   };
 
+  function sendBookingToServer() {
+    sendToServer(name, arrival)
+      .then(() => {
+        window.alert("Booking sent to server");
+      })
+      .catch((error) => {
+        console.error("Failed to send booking to server", error);
+        window.alert("Failed to send booking to server");
+      });
+  }
+
   const sendBooking = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -35,29 +46,26 @@ export default function CreateBooking() {
         .then(function (reg) {
           queueBookingOnIndexDB();
           // @ts-expect-error - sync is not defined on ServiceWorkerRegistration
-          return reg.sync.register("sync-new-booking");
+          reg.sync
+            .register("sync-new-booking")
+            .then(() => {
+              console.log("Sync registered");
+              window.alert("Sync registered");
+            })
+            .catch((error) => {
+              console.error("Failed to register sync", error);
+              sendBookingToServer();
+            });
         })
         .catch(function (error) {
           console.error("Failed to register sync", error);
           window.alert("Failed to register sync");
-          sendToServer(name, arrival)
-            .then(() => {
-              window.alert("Booking sent to server");
-            })
-            .catch(() => {
-              window.alert("Failed to send booking to server");
-            });
+          sendBookingToServer();
         });
     } else {
       console.log("Sync not supported");
       window.alert("Sync not supported");
-      sendToServer(name, arrival)
-        .then(() => {
-          window.alert("Booking sent to server");
-        })
-        .catch(() => {
-          window.alert("Failed to send booking to server");
-        });
+      sendBookingToServer();
     }
   };
 
